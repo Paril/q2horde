@@ -449,7 +449,7 @@ TOUCH(point_combat_touch) (edict_t *self, edict_t *other, const trace_t &tr, boo
 
 void SP_point_combat(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -662,7 +662,7 @@ void SP_dynamic_light(edict_t* self)
 void SP_light(edict_t *self)
 {
 	// no targeted lights in deathmatch, because they cause global messages
-	if((!self->targetname || (deathmatch->integer && !(self->spawnflags.has(SPAWNFLAG_LIGHT_ALLOW_IN_DM)))) && st.sl.data.radius == 0) // [Sam-KEX]
+	if((!self->targetname || (G_IsDeathmatch() && !(self->spawnflags.has(SPAWNFLAG_LIGHT_ALLOW_IN_DM)))) && st.sl.data.radius == 0) // [Sam-KEX]
 	{
 		G_FreeEdict(self);
 		return;
@@ -1036,7 +1036,7 @@ USE(func_explosive_spawn) (edict_t *self, edict_t *other, edict_t *activator) ->
 
 void SP_func_explosive(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(self);
 		return;
@@ -1190,7 +1190,7 @@ THINK(barrel_start) (edict_t *self) -> void
 
 void SP_misc_explobox(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(self);
 		return;
@@ -1469,7 +1469,7 @@ DIE(misc_deadsoldier_die) (edict_t *self, edict_t *inflictor, edict_t *attacker,
 
 void SP_misc_deadsoldier(edict_t *ent)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(ent);
 		return;

@@ -1095,7 +1095,7 @@ void SP_monster_carrier(edict_t *self)
 	// 2000 - 4000 health
 	self->health = max(2000, 2000 + 1000 * (skill->integer - 1)) * st.health_multiplier;
 	// add health in coop (500 * skill)
-	if (coop->integer)
+	if (G_IsCooperative())
 		self->health += 500 * skill->integer;
 
 	self->gib_health = -200;

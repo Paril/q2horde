@@ -494,13 +494,19 @@ bool OnSameTeam(edict_t *ent1, edict_t *ent2)
 {
 	// monsters are never on our team atm
 	if (!ent1->client || !ent2->client)
+	{
+		// Paril: horde, yes they are!
+		if (g_horde->integer && (ent1->svflags & SVF_MONSTER) && (ent2->svflags & SVF_MONSTER))
+			return true;
+
 		return false;
+	}
 	// we're never on our own team
 	else if (ent1 == ent2)
 		return false;
 
 	// [Paril-KEX] coop 'team' support
-	if (coop->integer)
+	if (G_IsCooperative())
 		return ent1->client && ent2->client;
 	// ZOID
 	else if (G_TeamplayEnabled() && ent1->client && ent2->client)
@@ -564,7 +570,7 @@ void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, const vec3_t
 
 	// ROGUE
 	//  allow the deathmatch game to change values
-	if (deathmatch->integer && gamerules->integer)
+	if (G_IsDeathmatch() && gamerules->integer)
 	{
 		if (DMGame.ChangeDamage)
 			damage = DMGame.ChangeDamage(targ, attacker, damage, mod);
@@ -577,7 +583,7 @@ void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, const vec3_t
 	// ROGUE
 
 	// easy mode takes half damage
-	if (skill->integer == 0 && deathmatch->integer == 0 && targ->client && damage)
+	if (skill->integer == 0 && !G_IsDeathmatch() && targ->client && damage)
 	{
 		damage /= 2;
 		if (!damage)

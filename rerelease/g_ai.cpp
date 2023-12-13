@@ -764,7 +764,7 @@ bool FindTarget(edict_t *self)
     }
 
     // ROGUE - hintpath coop fix
-    if ((self->monsterinfo.aiflags & AI_HINT_PATH) && coop->integer)
+    if ((self->monsterinfo.aiflags & AI_HINT_PATH) && G_IsCooperative())
         heardit = false;
     // ROGUE
 
@@ -928,6 +928,7 @@ bool M_CheckAttack_Base(edict_t *self, float stand_ground_chance, float melee_ch
 
         spot1 = self->s.origin;
         spot1[2] += self->viewheight;
+
         // see if any entities are in the way of the shot
         if (!self->enemy->client || self->enemy->solid)
         {
@@ -935,7 +936,13 @@ bool M_CheckAttack_Base(edict_t *self, float stand_ground_chance, float melee_ch
             spot2[2] += self->enemy->viewheight;
 
             tr = gi.traceline(spot1, spot2, self,
-                MASK_SOLID | CONTENTS_MONSTER | CONTENTS_PLAYER | CONTENTS_SLIME | CONTENTS_LAVA);
+                MASK_SOLID | CONTENTS_MONSTER | CONTENTS_PLAYER | CONTENTS_SLIME | CONTENTS_LAVA
+                    | CONTENTS_PROJECTILECLIP // Paril: horde
+                    );
+
+            // Paril: horde
+            if (tr.startsolid)
+                return false;
         }
         else
         {
@@ -970,7 +977,9 @@ bool M_CheckAttack_Base(edict_t *self, float stand_ground_chance, float melee_ch
                         {
                             // make sure we're not going to shoot a monster
                             tr = gi.traceline(spot1, self->monsterinfo.blind_fire_target, self,
-                                CONTENTS_MONSTER);
+                                CONTENTS_MONSTER
+                                    | CONTENTS_PROJECTILECLIP // Paril: horde
+                                    );
                             if (tr.allsolid || tr.startsolid || ((tr.fraction < 1.0f) && (tr.ent != self->enemy)))
                                 return false;
 
@@ -1491,7 +1500,7 @@ void ai_run(edict_t *self, float dist)
             return;
         }
 
-        if (coop->integer)
+        if (G_IsCooperative())
         {
             // if we're in coop, check my real enemy first .. if I SEE him, set gotcha to true
             if (self->enemy && visible(self, realEnemy))
@@ -1662,7 +1671,7 @@ void ai_run(edict_t *self, float dist)
 
     // PMM - moved down here to allow monsters to get on hint paths
     // coop will change to another enemy if visible
-    if (coop->integer)
+    if (G_IsCooperative())
         FindTarget(self);
     // pmm
 

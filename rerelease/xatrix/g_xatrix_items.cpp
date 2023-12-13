@@ -6,7 +6,7 @@
 // RAFAEL
 void SP_item_foodcube(edict_t *self)
 {
-	if (deathmatch->integer && g_no_health->integer)
+	if (G_IsDeathmatch() && g_no_health->integer)
 	{
 		G_FreeEdict(self);
 		return;

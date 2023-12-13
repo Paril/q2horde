@@ -1070,13 +1070,13 @@ void G_FindTeams()
 inline bool G_InhibitEntity(edict_t *ent)
 {
 	// dm-only
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		return ent->spawnflags.has(SPAWNFLAG_NOT_DEATHMATCH);
 
 	// coop flags
-	if (coop->integer && ent->spawnflags.has(SPAWNFLAG_NOT_COOP))
+	if (G_IsCooperative() && ent->spawnflags.has(SPAWNFLAG_NOT_COOP))
 		return true;
-	else if (!coop->integer && ent->spawnflags.has(SPAWNFLAG_COOP_ONLY))
+	else if (!G_IsCooperative() && ent->spawnflags.has(SPAWNFLAG_COOP_ONLY))
 		return true;
 
 	// skill
@@ -1090,7 +1090,7 @@ void setup_shadow_lights();
 // [Paril-KEX]
 void G_PrecacheInventoryItems()
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		return;
 
 	for (size_t i = 0; i < game.maxclients; i++)
@@ -1252,7 +1252,7 @@ void SpawnEntities(const char *mapname, const char *entities, const char *spawnp
 	// ZOID
 
 	// ROGUE
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		if (g_dm_random_items->integer)
 			PrecacheForRandomRespawn();
@@ -1264,7 +1264,7 @@ void SpawnEntities(const char *mapname, const char *entities, const char *spawnp
 	// ROGUE
 
 	// ROGUE	-- allow dm games to do init stuff right before game starts.
-	if (deathmatch->integer && gamerules->integer)
+	if (G_IsDeathmatch() && gamerules->integer)
 	{
 		if (DMGame.PostInitSetup)
 			DMGame.PostInitSetup();
@@ -1315,7 +1315,7 @@ static void G_InitStatusbar()
 	sb.ifstat(STAT_HELPICON).xv(150).pic(STAT_HELPICON).endifstat();
 
 	// ---- gamemode-specific stuff ----
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 	{
 		// SP/coop
 		// key display
@@ -1332,7 +1332,7 @@ static void G_InitStatusbar()
 		sb.ifstat(STAT_KEY_B).xv(272).pic(STAT_KEY_B).endifstat();
 		sb.ifstat(STAT_KEY_C).xv(248).pic(STAT_KEY_C).endifstat();
 
-		if (coop->integer)
+		if (G_IsCooperative())
 		{
 			// top of screen coop respawn display
 			sb.ifstat(STAT_COOP_RESPAWN).xv(0).yt(0).loc_stat_cstring2(STAT_COOP_RESPAWN).endifstat();
@@ -1393,7 +1393,7 @@ static void G_InitStatusbar()
 	}
 
 	// ---- more shared stuff ----
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		// tech
 		sb.ifstat(STAT_CTF_TECH).yb(-137).xr(-26).pic(STAT_CTF_TECH).endifstat();
@@ -1492,7 +1492,7 @@ void SP_worldspawn(edict_t *ent)
 	}
 
 	// [Paril-KEX]
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 		gi.configstring(CS_GAME_STYLE, G_Fmt("{}", (int32_t) game_style_t::GAME_STYLE_PVE).data());
 	else if (teamplay->integer || ctf->integer)
 		gi.configstring(CS_GAME_STYLE, G_Fmt("{}", (int32_t) game_style_t::GAME_STYLE_TDM).data());
@@ -1514,7 +1514,7 @@ void SP_worldspawn(edict_t *ent)
 
 	gi.configstring(CS_MAXCLIENTS, G_Fmt("{}", game.maxclients).data());
 
-	if (level.is_n64 && !deathmatch->integer)
+	if (level.is_n64 && !G_IsDeathmatch())
 	{
 		gi.configstring(CONFIG_N64_PHYSICS, "1");
 		pm_config.n64_physics = true;
@@ -1713,7 +1713,7 @@ void SP_worldspawn(edict_t *ent)
 	gi.configstring(CS_LIGHTS + 63, "a");
 
 	// coop respawn strings
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		gi.configstring(CONFIG_COOP_RESPAWN_STRING + 0, "$g_coop_respawn_in_combat");
 		gi.configstring(CONFIG_COOP_RESPAWN_STRING + 1, "$g_coop_respawn_bad_area");
@@ -1721,4 +1721,7 @@ void SP_worldspawn(edict_t *ent)
 		gi.configstring(CONFIG_COOP_RESPAWN_STRING + 3, "$g_coop_respawn_waiting");
 		gi.configstring(CONFIG_COOP_RESPAWN_STRING + 4, "$g_coop_respawn_no_lives");
 	}
+
+	// Paril: horde
+	Horde_Init();
 }

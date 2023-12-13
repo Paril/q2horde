@@ -304,7 +304,7 @@ USE(trigger_key_use) (edict_t *self, edict_t *other, edict_t *activator) -> void
 	}
 
 	gi.sound(activator, CHAN_AUTO, gi.soundindex("misc/keyuse.wav"), 1, ATTN_NORM, 0);
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		edict_t *ent;
 
@@ -1218,7 +1218,7 @@ inline bool trigger_coop_relay_filter(edict_t *player)
 static bool trigger_coop_relay_can_use(edict_t *self, edict_t *activator)
 {
 	// not coop, so act like a standard trigger_relay minus the message
-	if (!coop->integer)
+	if (!G_IsCooperative())
 		return true;
 
 	// coop; scan for all alive players, print appropriate message

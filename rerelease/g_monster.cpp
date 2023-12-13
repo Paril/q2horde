@@ -456,7 +456,7 @@ void M_SetEffects(edict_t *ent)
 }
 
 bool M_AllowSpawn( edict_t * self ) {
-	if ( deathmatch->integer && !ai_allow_dm_spawn->integer ) {
+	if ( G_IsDeathmatch() && !ai_allow_dm_spawn->integer ) {
 		return false;
 	}
 	return true;
@@ -614,7 +614,7 @@ void G_MonsterKilled(edict_t *self)
 {
 	level.killed_monsters++;
 
-	if (coop->integer && self->enemy && self->enemy->client)
+	if (G_IsCooperative() && self->enemy && self->enemy->client)
 		self->enemy->client->resp.score++;
 
 	if (g_debug_monster_kills->integer)

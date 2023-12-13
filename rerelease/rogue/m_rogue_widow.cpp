@@ -280,7 +280,7 @@ void WidowSpawn(edict_t *self)
 
 			ent->monsterinfo.aiflags |= AI_SPAWNED_WIDOW | AI_DO_NOT_COUNT | AI_IGNORE_SHOTS;
 
-			if (!coop->integer)
+			if (!G_IsCooperative())
 			{
 				designated_enemy = self->enemy;
 			}
@@ -1073,7 +1073,7 @@ void WidowPowerups(edict_t *self)
 {
 	edict_t *ent;
 
-	if (!coop->integer)
+	if (!G_IsCooperative())
 	{
 		WidowRespondPowerup(self, self->enemy);
 	}
@@ -1199,7 +1199,7 @@ void WidowCalcSlots(edict_t *self)
 		self->monsterinfo.monster_slots = 3;
 		break;
 	}
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		self->monsterinfo.monster_slots = min(6, self->monsterinfo.monster_slots + (skill->integer * (CountPlayers() - 1)));
 	}
@@ -1260,7 +1260,7 @@ void SP_monster_widow(edict_t *self)
 	self->maxs = { 40, 40, 144 };
 
 	self->health = (2000 + 1000 * skill->integer) * st.health_multiplier;
-	if (coop->integer)
+	if (G_IsCooperative())
 		self->health += 500 * skill->integer;
 	self->gib_health = -5000;
 	self->mass = 1500;

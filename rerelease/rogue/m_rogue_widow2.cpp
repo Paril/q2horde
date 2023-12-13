@@ -173,7 +173,7 @@ void Widow2Spawn(edict_t *self)
 
 			ent->monsterinfo.aiflags |= AI_SPAWNED_WIDOW | AI_DO_NOT_COUNT | AI_IGNORE_SHOTS;
 
-			if (!coop->integer)
+			if (!G_IsCooperative())
 			{
 				designated_enemy = self->enemy;
 			}
@@ -1023,7 +1023,7 @@ void SP_monster_widow2(edict_t *self)
 	self->maxs = { 70, 70, 144 };
 
 	self->health = (2000 + 800 + 1000 * skill->integer) * st.health_multiplier;
-	if (coop->integer)
+	if (G_IsCooperative())
 		self->health += 500 * skill->integer;
 	//	self->health = 1;
 	self->gib_health = -900;
@@ -1227,7 +1227,7 @@ void ThrowMoreStuff(edict_t *self, const vec3_t &point)
 {
 	int n;
 
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		ThrowSmallStuff(self, point);
 		return;

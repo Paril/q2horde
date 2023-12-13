@@ -124,7 +124,7 @@ void G_PrintActivationMessage(edict_t *ent, edict_t *activator, bool coop_global
 	//
 	if ((ent->message) && !(activator->svflags & SVF_MONSTER))
 	{
-		if (coop_global && coop->integer)
+		if (coop_global && G_IsCooperative())
 			gi.LocBroadcast_Print(PRINT_CENTER, "{}", ent->message);
 		else
 			gi.LocCenter_Print(activator, "{}", ent->message);
@@ -517,7 +517,7 @@ bool KillBox(edict_t *ent, bool from_spawning, mod_id_t mod, bool bsp_clipping)
 	contents_t mask = CONTENTS_MONSTER | CONTENTS_PLAYER;
 
 	// [Paril-KEX] don't gib other players in coop if we're not colliding
-	if (from_spawning && ent->client && coop->integer && !G_ShouldPlayersCollide(false))
+	if (from_spawning && ent->client && G_IsCooperative() && !G_ShouldPlayersCollide(false))
 		mask &= ~CONTENTS_PLAYER;
 
 	int		 i, num;
@@ -548,7 +548,7 @@ bool KillBox(edict_t *ent, bool from_spawning, mod_id_t mod, bool bsp_clipping)
 		// [Paril-KEX] don't allow telefragging of friends in coop.
 		// the player that is about to be telefragged will have collision
 		// disabled until another time.
-		if (ent->client && hit->client && coop->integer)
+		if (ent->client && hit->client && G_IsCooperative())
 		{
 			hit->clipmask &= ~CONTENTS_PLAYER;
 			ent->clipmask &= ~CONTENTS_PLAYER;

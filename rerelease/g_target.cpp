@@ -154,7 +154,7 @@ When fired, the "message" key becomes the current personal computer string, and 
 */
 void SP_target_help(edict_t *ent)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(ent);
 		return;
@@ -204,7 +204,7 @@ THINK(G_VerifyTargetted) (edict_t *ent) -> void
 
 void SP_target_secret(edict_t *ent)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(ent);
 		return;
@@ -226,7 +226,7 @@ void SP_target_secret(edict_t *ent)
 void G_PlayerNotifyGoal(edict_t *player)
 {
 	// no goals in DM
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		return;
 
 	if (!player->client->pers.spawned)
@@ -336,7 +336,7 @@ USE(use_target_goal) (edict_t *ent, edict_t *other, edict_t *activator) -> void
 
 void SP_target_goal(edict_t *ent)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(ent);
 		return;
@@ -405,21 +405,21 @@ USE(use_target_changelevel) (edict_t *self, edict_t *other, edict_t *activator) 
 	if (level.intermissiontime)
 		return; // already activated
 
-	if (!deathmatch->integer && !coop->integer)
+	if (!G_IsDeathmatch() && !G_IsCooperative())
 	{
 		if (g_edicts[1].health <= 0)
 			return;
 	}
 
 	// if noexit, do a ton of damage to other
-	if (deathmatch->integer && !g_dm_allow_exit->integer && other != world)
+	if (G_IsDeathmatch() && !g_dm_allow_exit->integer && other != world)
 	{
 		T_Damage(other, self, self, vec3_origin, other->s.origin, vec3_origin, 10 * other->max_health, 1000, DAMAGE_NONE, MOD_EXIT);
 		return;
 	}
 
 	// if multiplayer, let everyone know who hit the exit
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		if (level.time < 10_sec)
 			return;
@@ -433,7 +433,7 @@ USE(use_target_changelevel) (edict_t *self, edict_t *other, edict_t *activator) 
 		game.cross_level_flags &= ~(SFL_CROSS_TRIGGER_MASK);
 
 	// if map has a landmark, store position instead of using spawn next map
-	if (activator && activator->client && !deathmatch->integer)
+	if (activator && activator->client && !G_IsDeathmatch())
 	{
 		activator->client->landmark_name = nullptr;
 		activator->client->landmark_rel_pos = vec3_origin;
@@ -967,7 +967,7 @@ void SP_target_lightramp(edict_t *self)
 		return;
 	}
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -1354,7 +1354,7 @@ USE(use_target_camera) (edict_t *self, edict_t *other, edict_t *activator) -> vo
 
 void SP_target_camera(edict_t* self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(self);
 		return;
@@ -1777,7 +1777,7 @@ THINK(target_poi_setup) (edict_t *self) -> void
 
 void SP_target_poi(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{ // auto-remove for deathmatch
 		G_FreeEdict(self);
 		return;
@@ -1870,7 +1870,7 @@ THINK(check_target_healthbar) (edict_t *ent) -> void
 
 void SP_target_healthbar(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -1913,7 +1913,7 @@ USE(use_target_autosave) (edict_t *ent, edict_t *other, edict_t *activator) -> v
 
 void SP_target_autosave(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -1990,7 +1990,7 @@ USE(trigger_crossunit_trigger_use) (edict_t *self, edict_t *other, edict_t *acti
 
 void SP_target_crossunit_trigger(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -2017,7 +2017,7 @@ THINK(target_crossunit_target_think) (edict_t *self) -> void
 
 void SP_target_crossunit_target(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -2045,7 +2045,7 @@ USE(use_target_achievement) (edict_t *self, edict_t *other, edict_t *activator) 
 
 void SP_target_achievement(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;
@@ -2067,7 +2067,7 @@ USE(use_target_story) (edict_t *self, edict_t *other, edict_t *activator) -> voi
 
 void SP_target_story(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;

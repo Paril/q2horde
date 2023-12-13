@@ -161,7 +161,7 @@ TOUCH(Prox_Field_Touch) (edict_t *ent, edict_t *other, const trace_t &tr, bool o
 	if (CheckTeamDamage(prox->teammaster, other))
 		return;
 
-	if (!deathmatch->integer && other->client)
+	if (!G_IsDeathmatch() && other->client)
 		return;
 
 	if (other == prox) // don't set self off
@@ -214,7 +214,7 @@ THINK(prox_open) (edict_t *ent) -> void
 		// doesn't get stuck on it while it's opening if fired at point blank wall
 		ent->s.sound = 0;
 
-		if (deathmatch->integer)
+		if (G_IsDeathmatch())
 			ent->owner = nullptr;
 
 		if (ent->teamchain)
@@ -235,8 +235,8 @@ THINK(prox_open) (edict_t *ent) -> void
 			if (
 				search != ent &&
 				(
-					(((search->svflags & SVF_MONSTER) || (deathmatch->integer && (search->client || (search->classname && !strcmp(search->classname, "prox_mine"))))) && (search->health > 0)) ||
-					(deathmatch->integer &&
+					(((search->svflags & SVF_MONSTER) || (G_IsDeathmatch() && (search->client || (search->classname && !strcmp(search->classname, "prox_mine"))))) && (search->health > 0)) ||
+					(G_IsDeathmatch() &&
 					 ((!strncmp(search->classname, "info_player_", 12)) ||
 					  (!strcmp(search->classname, "misc_teleporter_dest")) ||
 					  (!strncmp(search->classname, "item_flag_", 10))))) &&
@@ -885,7 +885,7 @@ static BoxEdictsResult_t tesla_think_active_BoxFilter(edict_t *check, void *data
 	// don't hit teammates
 	if (check->client)
 	{
-		if (!deathmatch->integer)
+		if (!G_IsDeathmatch())
 			return BoxEdictsResult_t::Skip;
 		else if (CheckTeamDamage(check, self->teammaster))
 			return BoxEdictsResult_t::Skip;
@@ -894,7 +894,7 @@ static BoxEdictsResult_t tesla_think_active_BoxFilter(edict_t *check, void *data
 		return BoxEdictsResult_t::Skip;
 
 	// don't hit other teslas in SP/coop
-	if (!deathmatch->integer && check->classname && (check->flags & FL_TRAP))
+	if (!G_IsDeathmatch() && check->classname && (check->flags & FL_TRAP))
 		return BoxEdictsResult_t::Skip;
 
 	return BoxEdictsResult_t::Keep;
@@ -934,7 +934,7 @@ THINK(tesla_think_active) (edict_t *self) -> void
 		// don't hit teammates
 		if (hit->client)
 		{
-			if (!deathmatch->integer)
+			if (!G_IsDeathmatch())
 				continue;
 			else if (CheckTeamDamage(hit, self->teamchain->owner))
 				continue;
@@ -988,7 +988,7 @@ THINK(tesla_activate) (edict_t *self) -> void
 	}
 
 	// only check for spawn points in deathmatch
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		search = nullptr;
 		while ((search = findradius(search, self->s.origin, 1.5f * TESLA_DAMAGE_RADIUS)) != nullptr)
@@ -998,7 +998,7 @@ THINK(tesla_activate) (edict_t *self) -> void
 			// or it's a player start point
 			// and we can see it
 			// blow up
-			if (search->classname && ((deathmatch->integer &&
+			if (search->classname && ((G_IsDeathmatch() &&
 					((!strncmp(search->classname, "info_player_", 12)) ||
 					(!strcmp(search->classname, "misc_teleporter_dest")) ||
 					(!strncmp(search->classname, "item_flag_", 10))))) &&
@@ -1024,7 +1024,7 @@ THINK(tesla_activate) (edict_t *self) -> void
 
 	self->s.angles = {};
 	// clear the owner if in deathmatch
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		self->owner = nullptr;
 	self->teamchain = trigger;
 	self->think = tesla_think_active;
@@ -1128,7 +1128,7 @@ void fire_tesla(edict_t *self, const vec3_t &start, const vec3_t &aimdir, int te
 	// blow up on contact with lava & slime code
 	tesla->touch = tesla_lava;
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		// PMM - lowered from 50 - 7/29/1998
 		tesla->health = 20;
 	else

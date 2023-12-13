@@ -412,7 +412,7 @@ void InfantryPrecache();
 
 void SP_turret_driver(edict_t *self)
 {
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;

@@ -52,6 +52,10 @@ contents_t G_GetClipMask(edict_t *ent)
 	if ((ent->svflags & (SVF_MONSTER | SVF_PLAYER)) && (ent->svflags & SVF_DEADMONSTER))
 		mask &= ~(CONTENTS_MONSTER | CONTENTS_PLAYER);
 
+	// horde mode
+	if (g_horde->integer && (ent->svflags & SVF_MONSTER))
+		mask &= ~CONTENTS_MONSTER;
+
 	return mask;
 }
 
@@ -415,7 +419,7 @@ push all box objects
 void SV_Physics_Pusher(edict_t *ent)
 {
 	vec3_t	 move, amove;
-	edict_t *part, *mv;
+	edict_t *part;
 
 	// if not a team captain, so movement will be handled elsewhere
 	if (ent->flags & FL_TEAMSLAVE)
@@ -844,8 +848,9 @@ void SV_Physics_Step(edict_t *ent)
 
 		// [Paril-KEX] this is something N64 does to avoid doors opening
 		// at the start of a level, which triggers some monsters to spawn.
-		if (!level.is_n64 || level.time > FRAME_TIME_S)
-			G_TouchTriggers(ent);
+		if (!g_horde->integer) // Paril
+			if (!level.is_n64 || level.time > FRAME_TIME_S)
+				G_TouchTriggers(ent);
 
 		if (!ent->inuse)
 			return;
@@ -855,6 +860,9 @@ void SV_Physics_Step(edict_t *ent)
 				if (hitsound)
 					ent->s.event = EV_FOOTSTEP;
 	}
+
+	if (g_horde->integer)
+		G_TouchTriggers(ent);
 
 	if (!ent->inuse) // PGM g_touchtrigger free problem
 		return;

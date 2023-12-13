@@ -274,7 +274,7 @@ The tag token for deathmatch tag games.
 */
 void SP_dm_tag_token(edict_t *self)
 {
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 	{
 		G_FreeEdict(self);
 		return;

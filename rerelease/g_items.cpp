@@ -201,12 +201,12 @@ void SetRespawn(edict_t *ent, gtime_t delay, bool hide_self)
 
 bool IsInstantItemsEnabled()
 {
-	if (deathmatch->integer && g_dm_instant_items->integer)
+	if (G_IsDeathmatch() && g_dm_instant_items->integer)
 	{
 		return true;
 	}
 
-	if (!deathmatch->integer && level.instantitems)
+	if (!G_IsDeathmatch() && level.instantitems)
 	{
 		return true;
 	}
@@ -224,7 +224,7 @@ bool Pickup_Powerup(edict_t *ent, edict_t *other)
 		(skill->integer >= 2 && quantity >= 1))
 		return false;
 
-	if (coop->integer && !P_UseCoopInstancedItems() && (ent->item->flags & IF_STAY_COOP) && (quantity > 0))
+	if (G_IsCooperative() && !P_UseCoopInstancedItems() && (ent->item->flags & IF_STAY_COOP) && (quantity > 0))
 		return false;
 
 	other->client->pers.inventory[ent->item->id]++;
@@ -244,7 +244,7 @@ bool Pickup_Powerup(edict_t *ent, edict_t *other)
 			ent->item->use(other, ent->item);
 	}
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && !is_dropped_from_death)
 			SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
@@ -260,7 +260,7 @@ bool Pickup_General(edict_t *ent, edict_t *other)
 
 	other->client->pers.inventory[ent->item->id]++;
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED))
 			SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
@@ -281,7 +281,7 @@ void Drop_General(edict_t *ent, gitem_t *item)
 
 void Use_Adrenaline(edict_t *ent, gitem_t *item)
 {
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 		ent->max_health += 1;
 
 	if (ent->health < ent->max_health)
@@ -297,7 +297,7 @@ bool Pickup_LegacyHead(edict_t *ent, edict_t *other)
 	other->max_health += 5;
 	other->health += 5;
 
-	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 		SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
 
 	return true;
@@ -374,7 +374,7 @@ bool Pickup_Bandolier(edict_t *ent, edict_t *other)
 	G_AddAmmoAndCapQuantity(other, AMMO_BULLETS);
 	G_AddAmmoAndCapQuantity(other, AMMO_SHELLS);
 
-	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 		SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
 
 	return true;
@@ -408,7 +408,7 @@ bool Pickup_Pack(edict_t *ent, edict_t *other)
 	G_AddAmmoAndCapQuantity(other, AMMO_DISRUPTOR);
 	// ROGUE
 
-	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 		SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
 
 	return true;
@@ -517,7 +517,7 @@ void Use_Silencer(edict_t *ent, gitem_t *item)
 
 bool Pickup_Key(edict_t *ent, edict_t *other)
 {
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		if (ent->item->id == IT_KEY_POWER_CUBE || ent->item->id == IT_KEY_EXPLOSIVE_CHARGES)
 		{
@@ -575,10 +575,10 @@ void G_CheckAutoSwitch(edict_t *ent, gitem_t *item, bool is_new)
 
 		// smartness algorithm: in DM, we will always switch if we have the blaster out
 		// otherwise leave our active weapon alone
-		if (deathmatch->integer && !using_blaster)
+		if (G_IsDeathmatch() && !using_blaster)
 			return;
 		// in SP, only switch if it's a new weapon, or we have the blaster out
-		else if (!deathmatch->integer && !using_blaster && !is_new)
+		else if (!G_IsDeathmatch() && !using_blaster && !is_new)
 			return;
 	}
 
@@ -608,7 +608,7 @@ bool Pickup_Ammo(edict_t *ent, edict_t *other)
 	if (weapon)
 		G_CheckAutoSwitch(other, ent->item, !oldcount);
 
-	if (!(ent->spawnflags & (SPAWNFLAG_ITEM_DROPPED | SPAWNFLAG_ITEM_DROPPED_PLAYER)) && deathmatch->integer)
+	if (!(ent->spawnflags & (SPAWNFLAG_ITEM_DROPPED | SPAWNFLAG_ITEM_DROPPED_PLAYER)) && G_IsDeathmatch())
 		SetRespawn(ent, 30_sec);
 	return true;
 }
@@ -656,7 +656,7 @@ THINK(MegaHealth_think) (edict_t *self) -> void
 		return;
 	}
 
-	if (!(self->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+	if (!(self->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 		SetRespawn(self, 20_sec);
 	else
 		G_FreeEdict(self);
@@ -673,7 +673,7 @@ bool Pickup_Health(edict_t *ent, edict_t *other)
 	int count = ent->count ? ent->count : ent->item->quantity;
 
 	// ZOID
-	if (deathmatch->integer && other->health >= 250 && count > 25)
+	if (G_IsDeathmatch() && other->health >= 250 && count > 25)
 		return false;
 	// ZOID
 
@@ -696,7 +696,7 @@ bool Pickup_Health(edict_t *ent, edict_t *other)
 		//ZOID
 		)
 	{
-		if (!deathmatch->integer)
+		if (!G_IsDeathmatch())
 		{
 			// mega health doesn't need to be special in SP
 			// since it never respawns.
@@ -714,7 +714,7 @@ bool Pickup_Health(edict_t *ent, edict_t *other)
 	}
 	else
 	{
-		if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+		if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 			SetRespawn(ent, 30_sec);
 	}
 
@@ -816,7 +816,7 @@ bool Pickup_Armor(edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && deathmatch->integer)
+	if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED) && G_IsDeathmatch())
 		SetRespawn(ent, 20_sec);
 
 	return true;
@@ -874,7 +874,7 @@ bool Pickup_PowerArmor(edict_t *ent, edict_t *other)
 
 	other->client->pers.inventory[ent->item->id]++;
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		if (!(ent->spawnflags & SPAWNFLAG_ITEM_DROPPED))
 			SetRespawn(ent, gtime_t::from_sec(ent->item->quantity));
@@ -919,7 +919,7 @@ TOUCH(Touch_Item) (edict_t *ent, edict_t *other, const trace_t &tr, bool other_t
 		return; // not a grabbable item?
 
 	// already got this instanced item
-	if (coop->integer && P_UseCoopInstancedItems())
+	if (G_IsCooperative() && P_UseCoopInstancedItems())
 	{
 		if (ent->item_picked_up_by[other->s.number - 1])
 			return;
@@ -958,7 +958,7 @@ TOUCH(Touch_Item) (edict_t *ent, edict_t *other, const trace_t &tr, bool other_t
 		
 		int32_t player_number = other->s.number - 1;
 
-		if (coop->integer && P_UseCoopInstancedItems() && !ent->item_picked_up_by[player_number])
+		if (G_IsCooperative() && P_UseCoopInstancedItems() && !ent->item_picked_up_by[player_number])
 		{
 			ent->item_picked_up_by[player_number] = true;
 
@@ -980,12 +980,12 @@ TOUCH(Touch_Item) (edict_t *ent, edict_t *other, const trace_t &tr, bool other_t
 		// even a documented feature, relays were traditionally used for this)
 		const char *message_backup = nullptr;
 
-		if (deathmatch->integer || (coop->integer && P_UseCoopInstancedItems()))
+		if (G_IsDeathmatch() || (G_IsCooperative() && P_UseCoopInstancedItems()))
 			std::swap(message_backup, ent->message);
 
 		G_UseTargets(ent, other);
 		
-		if (deathmatch->integer || (coop->integer && P_UseCoopInstancedItems()))
+		if (G_IsDeathmatch() || (G_IsCooperative() && P_UseCoopInstancedItems()))
 			std::swap(message_backup, ent->message);
 
 		ent->spawnflags |= SPAWNFLAG_ITEM_TARGETS_USED;
@@ -995,7 +995,7 @@ TOUCH(Touch_Item) (edict_t *ent, edict_t *other, const trace_t &tr, bool other_t
 	{
 		bool should_remove = false;
 
-		if (coop->integer)
+		if (G_IsCooperative())
 		{
 			// in coop with instanced items, *only* dropped 
 			// player items will ever get deleted permanently.
@@ -1007,7 +1007,7 @@ TOUCH(Touch_Item) (edict_t *ent, edict_t *other, const trace_t &tr, bool other_t
 				should_remove = ent->spawnflags.has(SPAWNFLAG_ITEM_DROPPED | SPAWNFLAG_ITEM_DROPPED_PLAYER) || !(ent->item->flags & IF_STAY_COOP);
 		}
 		else
-			should_remove = !deathmatch->integer || ent->spawnflags.has(SPAWNFLAG_ITEM_DROPPED | SPAWNFLAG_ITEM_DROPPED_PLAYER);
+			should_remove = !G_IsDeathmatch() || ent->spawnflags.has(SPAWNFLAG_ITEM_DROPPED | SPAWNFLAG_ITEM_DROPPED_PLAYER);
 
 		if (should_remove)
 		{
@@ -1032,7 +1032,7 @@ TOUCH(drop_temp_touch) (edict_t *ent, edict_t *other, const trace_t &tr, bool ot
 THINK(drop_make_touchable) (edict_t *ent) -> void
 {
 	ent->touch = Touch_Item;
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		ent->nextthink = level.time + 29_sec;
 		ent->think = G_FreeEdict;
@@ -1084,7 +1084,7 @@ edict_t *Drop_Item(edict_t *ent, gitem_t *item)
 	dropped->think = drop_make_touchable;
 	dropped->nextthink = level.time + 1_sec;
 
-	if (coop->integer && P_UseCoopInstancedItems())
+	if (G_IsCooperative() && P_UseCoopInstancedItems())
 		dropped->svflags |= SVF_INSTANCED;
 
 	gi.linkentity(dropped);
@@ -1306,7 +1306,7 @@ void SpawnItem(edict_t *ent, gitem_t *item)
 	}
 
 	// some items will be prevented in deathmatch
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 	{
 		// [Kex] In instagib, spawn no pickups!
 		if (g_instagib->value)
@@ -1407,7 +1407,7 @@ void SpawnItem(edict_t *ent, gitem_t *item)
 	//==========
 	// ROGUE
 	// DM only items
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 	{
 		if (item->pickup == Pickup_Doppleganger || item->pickup == Pickup_Nuke)
 		{
@@ -1446,14 +1446,14 @@ void SpawnItem(edict_t *ent, gitem_t *item)
 
 	PrecacheItem(item);
 
-	if (coop->integer && (item->id == IT_KEY_POWER_CUBE || item->id == IT_KEY_EXPLOSIVE_CHARGES))
+	if (G_IsCooperative() && (item->id == IT_KEY_POWER_CUBE || item->id == IT_KEY_EXPLOSIVE_CHARGES))
 	{
 		ent->spawnflags.value |= (1 << (8 + level.power_cubes));
 		level.power_cubes++;
 	}
 
 	// mark all items as instanced
-	if (coop->integer)
+	if (G_IsCooperative())
 	{
 		if (P_UseCoopInstancedItems())
 			ent->svflags |= SVF_INSTANCED;
@@ -3956,7 +3956,7 @@ void InitItems()
 	// in coop or DM with Weapons' Stay, remove drop ptr
 	for (auto &it : itemlist)
 	{
-		if (coop->integer)
+		if (G_IsCooperative())
 		{
 			if (!P_UseCoopInstancedItems() && (it.flags & IF_STAY_COOP))
 				it.drop = nullptr;
@@ -3969,7 +3969,7 @@ inline bool G_CanDropItem(const gitem_t &item)
 {
 	if (!item.drop)
 		return false;
-	else if ((item.flags & IF_WEAPON) && !(item.flags & IF_AMMO) && deathmatch->integer && g_dm_weapons_stay->integer)
+	else if ((item.flags & IF_WEAPON) && !(item.flags & IF_AMMO) && G_IsDeathmatch() && g_dm_weapons_stay->integer)
 		return false;
 
 	return true;

@@ -187,7 +187,7 @@ void Monster_UpdateState( edict_t * monster ) {
 		monster->sv.ent_flags |= SVFL_IN_WATER;
 	}
 
-	if ( coop->integer ) {
+	if ( G_IsCooperative() ) {
 		monster->sv.team = Team_Coop_Monster;
 	} else {
 		monster->sv.team = Team_None; // TODO: CTF/TDM/etc...

@@ -12,7 +12,7 @@ void weapon_ionripper_fire(edict_t *ent)
 	vec3_t tempang;
 	int	   damage;
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		// tone down for deathmatch
 		damage = 30;
 	else

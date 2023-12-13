@@ -2651,6 +2651,10 @@ constexpr spawnflags_t SPAWNFLAG_LANDMARK_KEEP_Z = 1_spawnflag;
 #include "ctf/g_ctf.h"
 #include "ctf/p_ctf_menu.h"
 // ZOID
+
+// Paril
+#include "horde/g_horde.h"
+
 //============================================================================
 
 // client_t->anim_priority

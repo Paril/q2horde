@@ -1000,7 +1000,7 @@ void G_SetClientEvent(edict_t *ent)
 
 	if (ent->client->ps.pmove.pm_flags & PMF_ON_LADDER)
 	{
-		if (!deathmatch->integer &&
+		if (!G_IsDeathmatch() &&
 			current_client->last_ladder_sound < level.time &&
 			(current_client->last_ladder_pos - ent->s.origin).length() > 48.f)
 		{
@@ -1253,7 +1253,7 @@ void G_LagCompensate(edict_t *from_player, const vec3_t &start, const vec3_t &di
 	uint32_t current_frame = gi.ServerFrame();
 
 	// if you need this to fight monsters, you need help
-	if (!deathmatch->integer)
+	if (!G_IsDeathmatch())
 		return;
 	else if (!g_lag_compensation->integer)
 		return;
@@ -1378,7 +1378,7 @@ void ClientEndServerFrame(edict_t *ent)
 	//
 	if (level.intermissiontime || ent->client->awaiting_respawn)
 	{
-		if (ent->client->awaiting_respawn || (level.intermission_eou || level.is_n64 || (deathmatch->integer && level.intermissiontime)))
+		if (ent->client->awaiting_respawn || (level.intermission_eou || level.is_n64 || (G_IsDeathmatch() && level.intermissiontime)))
 		{
 			current_client->ps.screen_blend[3] = current_client->ps.damage_blend[3] = 0;
 			current_client->ps.fov = 90;
@@ -1388,7 +1388,7 @@ void ClientEndServerFrame(edict_t *ent)
 		G_SetCoopStats(ent);
 
 		// if the scoreboard is up, update it if a client leaves
-		if (deathmatch->integer && ent->client->showscores && ent->client->menutime)
+		if (G_IsDeathmatch() && ent->client->showscores && ent->client->menutime)
 		{
 			DeathmatchScoreboardMessage(ent, ent->enemy);
 			gi.unicast(ent, false);
@@ -1524,7 +1524,7 @@ void ClientEndServerFrame(edict_t *ent)
 
 	P_AssignClientSkinnum(ent);
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		G_SaveLagCompensation(ent);
 
 	Compass_Update(ent, false);
@@ -1532,7 +1532,7 @@ void ClientEndServerFrame(edict_t *ent)
 	// [Paril-KEX] in coop, if player collision is enabled and
 	// we are currently in no-player-collision mode, check if
 	// it's safe.
-	if (coop->integer && G_ShouldPlayersCollide(false) && !(ent->clipmask & CONTENTS_PLAYER) && ent->takedamage)
+	if (G_IsCooperative() && G_ShouldPlayersCollide(false) && !(ent->clipmask & CONTENTS_PLAYER) && ent->takedamage)
 	{
 		bool clipped_player = false;
 

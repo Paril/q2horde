@@ -674,7 +674,7 @@ TOUCH(rocket_touch) (edict_t *ent, edict_t *other, const trace_t &tr, bool other
 	else
 	{
 		// don't throw any debris in net games
-		if (!deathmatch->integer && !coop->integer)
+		if (!G_IsDeathmatch() && !G_IsCooperative())
 		{
 			if (tr.surface && !(tr.surface->flags & (SURF_WARP | SURF_TRANS33 | SURF_TRANS66 | SURF_FLOWING)))
 			{
@@ -863,7 +863,7 @@ void fire_rail(edict_t *self, const vec3_t &start, const vec3_t &aimdir, int dam
 		if (binary_positional_search(org, start, args.tr.endpos, gi.inPHS, 3))
 		{
 			gi.WriteByte(svc_temp_entity);
-			gi.WriteByte((deathmatch->integer && g_instagib->integer) ? TE_RAILTRAIL2 : TE_RAILTRAIL);
+			gi.WriteByte((G_IsDeathmatch() && g_instagib->integer) ? TE_RAILTRAIL2 : TE_RAILTRAIL);
 			gi.WritePosition(start);
 			gi.WritePosition(args.tr.endpos);
 			gi.unicast(player, false, unicast_key);
@@ -1077,7 +1077,7 @@ THINK(bfg_think) (edict_t *self) -> void
 	int		 dmg;
 	trace_t	 tr;
 
-	if (deathmatch->integer)
+	if (G_IsDeathmatch())
 		dmg = 5;
 	else
 		dmg = 10;

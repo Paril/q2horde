@@ -1295,7 +1295,7 @@ void medic_finish_spawn(edict_t *self)
 		else
 			designated_enemy = self->enemy;
 
-		if (coop->integer)
+		if (G_IsCooperative())
 		{
 			designated_enemy = PickCoopTarget(ent);
 			if (designated_enemy)

@@ -667,6 +667,10 @@ bool SV_movestep(edict_t *ent, vec3_t move, bool relink)
 
 	contents_t mask = (ent->svflags & SVF_MONSTER) ? MASK_MONSTERSOLID : (MASK_SOLID | CONTENTS_MONSTER | CONTENTS_PLAYER);
 
+	// Paril: horde
+	if (g_horde->integer)
+		mask &= ~CONTENTS_MONSTER;
+
 	vec3_t start_up = oldorg + ent->gravityVector * (-1 * stepsize);
 
 	start_up = gi.trace(oldorg, ent->mins, ent->maxs, start_up, ent, mask).endpos;
@@ -736,7 +740,8 @@ bool SV_movestep(edict_t *ent, vec3_t move, bool relink)
 			if (relink)
 			{
 				gi.linkentity(ent);
-				G_TouchTriggers(ent);
+				if (!g_horde->integer) // Paril
+					G_TouchTriggers(ent);
 			}
 			ent->groundentity = nullptr;
 			return true;
@@ -822,7 +827,8 @@ bool SV_movestep(edict_t *ent, vec3_t move, bool relink)
 			if (relink)
 			{
 				gi.linkentity(ent);
-				G_TouchTriggers(ent);
+				if (!g_horde->integer) // Paril
+					G_TouchTriggers(ent);
 			}
 			return true;
 		}
@@ -871,8 +877,9 @@ bool SV_movestep(edict_t *ent, vec3_t move, bool relink)
 
 		// [Paril-KEX] this is something N64 does to avoid doors opening
 		// at the start of a level, which triggers some monsters to spawn.
-		if (!level.is_n64 || level.time > FRAME_TIME_S)
-			G_TouchTriggers(ent);
+		if (!g_horde->integer) // Paril
+			if (!level.is_n64 || level.time > FRAME_TIME_S)
+				G_TouchTriggers(ent);
 	}
 
 	if (stepped)
@@ -1003,12 +1010,14 @@ bool SV_StepDirection(edict_t *ent, float yaw, float dist, bool allow_no_turns)
 			}
 		}
 		gi.linkentity(ent);
-		G_TouchTriggers(ent);
+		if (!g_horde->integer) // Paril
+			G_TouchTriggers(ent);
 		G_TouchProjectiles(ent, oldorigin);
 		return true;
 	}
 	gi.linkentity(ent);
-	G_TouchTriggers(ent);
+	if (!g_horde->integer) // Paril
+		G_TouchTriggers(ent);
 	ent->ideal_yaw = old_ideal_yaw;
 	ent->s.angles[YAW] = old_current_yaw;
 	return false;
